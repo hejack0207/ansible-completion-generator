@@ -2,6 +2,7 @@
 .SHELL:=/usr/bin/zsh
 
 .PHONY: clean
+all: gen/actions.vim gen/reqargs.vim gen/optargs.vim json-schema.json
 
 #{{{ txt
 actions.txt:
@@ -25,10 +26,6 @@ gen/reqargs.vim: args.txt
 gen/optargs.vim: args.txt
 	print 'Wrote optional args to gen/optargs.vim'
 	vim --noplugin -u /dev/null -s txt2optargs.vim args.txt
-
-gen/actions.vim: actions.txt
-	print 'Wrote ansAction syntax to gen/actions.vim'
-	vim --noplugin -u /dev/null -s txt2syn.vim actions.txt
 #}}}
 
 #{{{ json-schema.json
