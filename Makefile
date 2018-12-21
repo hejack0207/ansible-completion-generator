@@ -15,19 +15,19 @@ args.txt: actions.txt
 
 #{{{ vim
 gen/actions.vim: actions.txt
-	print 'Wrote actions to ../autoload/actions.vim'
+	print 'Wrote actions to gen/actions.vim'
 	vim --noplugin -u /dev/null -s txt2actions.vim actions.txt
 
 gen/reqargs.vim: args.txt
-	print 'Wrote required args to ../autoload/reqargs.vim'
+	print 'Wrote required args to gen/reqargs.vim'
 	vim --noplugin -u /dev/null -s txt2reqargs.vim args.txt
 
 gen/optargs.vim: args.txt
-	print 'Wrote optional args to ../autoload/optargs.vim'
+	print 'Wrote optional args to gen/optargs.vim'
 	vim --noplugin -u /dev/null -s txt2optargs.vim args.txt
 
 gen/actions.vim: actions.txt
-	print 'Wrote ansAction syntax to ../syntax/actions.vim'
+	print 'Wrote ansAction syntax to gen/actions.vim'
 	vim --noplugin -u /dev/null -s txt2syn.vim actions.txt
 #}}}
 
