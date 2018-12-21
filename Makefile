@@ -3,7 +3,7 @@
 
 .PHONY: clean
 
-#{{{ vim
+#{{{ txt
 actions.txt:
 	print 'Generating text dump of actions...'
 	ansible-doc -l |sed '/^$$/,$$ d' >|actions.txt
@@ -11,7 +11,9 @@ actions.txt:
 args.txt: actions.txt
 	print 'Generating text dump of all args...'
 	while read -r cmd txt; do ansible-doc -s $$cmd 2>/dev/null; done <actions.txt >|args.txt
+#}}}
 
+#{{{ vim
 gen/actions.vim: actions.txt
 	print 'Wrote actions to ../autoload/actions.vim'
 	vim --noplugin -u /dev/null -s txt2actions.vim actions.txt
