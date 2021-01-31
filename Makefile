@@ -5,46 +5,52 @@
 all: gen/actions.vim gen/reqargs.vim gen/optargs.vim json-schema.json
 
 #{{{ txt
-actions.txt:
+txt/actions.txt:
 	print 'Generating text dump of actions...'
-	ansible-doc -l |sed '/^$$/,$$ d' >|actions.txt
+	mkdir -p txt
+	ansible-doc -l |sed '/^$$/,$$ d' >|$@
 
-args.txt: actions.txt
+txt/args.txt: txt/actions.txt
 	print 'Generating text dump of all args...'
-	while read -r cmd txt; do ansible-doc -s $$cmd 2>/dev/null; done <actions.txt >|args.txt
+	mkdir -p txt
+	while read -r cmd txt; do ansible-doc -s $$cmd 2>/dev/null; done <$< >|$@
 #}}}
 
 #{{{ vim
-gen/actions.vim: actions.txt
+gen/actions.vim: txt/actions.txt
 	print 'Wrote actions to gen/actions.vim'
-	vim --noplugin -u /dev/null -s txt2actions.vim actions.txt
+	mkdir -p gen
+	vim --noplugin -u /dev/null -s txt2actions.vim $<
 
-gen/reqargs.vim: args.txt
+gen/reqargs.vim: txt/args.txt
 	print 'Wrote required args to gen/reqargs.vim'
-	vim --noplugin -u /dev/null -s txt2reqargs.vim args.txt
+	mkdir -p gen
+	vim --noplugin -u /dev/null -s txt2reqargs.vim $<
 
-gen/optargs.vim: args.txt
+gen/optargs.vim: txt/args.txt
 	print 'Wrote optional args to gen/optargs.vim'
-	vim --noplugin -u /dev/null -s txt2optargs.vim args.txt
+	mkdir -p gen
+	vim --noplugin -u /dev/null -s txt2optargs.vim $<
 #}}}
 
 #{{{ json-schema.json
-args.xml: args.txt
-	sed -i 's/hosts:/hosts/g' args.txt
-	./txt2reqargs.py >args.xml
+xml/args.xml: txt/args.txt
+	mkdir -p xml
+	sed -i 's/hosts:/hosts/g' $<
+	./txt2reqargs.py >$@
 
-json-schema.xml: args.xml args-2-xml-jsonschema.xsl
-	saxon-xslt -o $@ args.xml ./args-2-xml-jsonschema.xsl
+json-schema.xml: xml/args.xml args-2-xml-jsonschema.xsl
+	saxon-xslt -o $@ $< ./args-2-xml-jsonschema.xsl
 	xmlstarlet fo $@ >/tmp/$@
 	cp /tmp/$@ $@
 
 json-schema.json: json-schema.xml
 	xml2json --strip_newlines --strip_text --pretty -t xml2json -o $@ --strip_text --strip_namespace $<
 	cat json-schema.json | jq '."json-schema"' >/tmp/json-schema.json
-	cp /tmp/json-schema.json json-schema.json
+	cp /tmp/json-schema.json $@
 #}}}
 
 clean:
-	rm -f json-schema.json json-schema.xml args.xml
+	rm -f json-schema.json json-schema.xml xml/* txt/* gen/*
 
 # vim: fdm=marker
